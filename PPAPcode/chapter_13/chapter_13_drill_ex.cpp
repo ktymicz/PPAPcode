@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
-#include "Simple_window.h" // get access to our window library
-#include "Graph.h"
+#include <Simple_window.h> // get access to our window library
+#include <Graph.h>
 
 
  const int width_window = 1920;
@@ -50,7 +50,7 @@ void  move_mark_Circle();
  // Tile a window with small right triangles
  void tile_right_triangles();
 
-int main()
+int chapter13()
 try
 {
     using namespace Graph_lib;
@@ -79,7 +79,7 @@ try
     // ex 11
     //foci_ellipse();
     // ex 12
-    //move_mark_Circle();
+    move_mark_Circle();
     // ex 13
     //rgb_color_chart_Invisible();
     // ex 14
@@ -92,7 +92,7 @@ try
 //     Graph_lib::Simple_window win(Point(100,100), width_window-100,height_window-100,"My window");
 //     win.attach(m);
 //     win.wait_for_button();
-
+    return 0;
 }
 catch(exception & e)
 {
@@ -692,8 +692,8 @@ void foci_ellipse()
      int h_ellipse=200;
 
      Point pstart(400,400);
-     Point pfoci1{pstart.x-sqrt(pow(w_ellipse,2)-pow(h_ellipse,2)),pstart.y};
-     Point pfoci2{pstart.x+sqrt(pow(w_ellipse,2)-pow(h_ellipse,2)),pstart.y};
+     Point pfoci1{pstart.x - (int) sqrt(pow(w_ellipse,2) -(int) pow(h_ellipse,2)),pstart.y};
+     Point pfoci2{pstart.x+(int)sqrt(pow(w_ellipse,2)-(int)pow(h_ellipse,2)),pstart.y};
      Mark mfoci1(pfoci1, 'x');
      win.attach(mfoci1);
      Mark mfoci2(pfoci2, 'x');
