@@ -15,7 +15,7 @@
  void octagon();
  void group_shape();
 
- int main()
+ int chapter14()
 try
 {
     /*using namespace Graph_lib;
@@ -34,7 +34,7 @@ try
     //striped_circle();
     //striped_closed_polyline();
     //octagon();
-    group_shape();
+    //group_shape();
     return 0;
 }
 catch(exception & e)
