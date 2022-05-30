@@ -7,8 +7,8 @@ extern int chapter14();
 
 int main(void)
 {
-	chapter12();
+	//chapter12();
 	//chapter13();
-	//chapter14();
+	chapter14();
 	return 0;
 }

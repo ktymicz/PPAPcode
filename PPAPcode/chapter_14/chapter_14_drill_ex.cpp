@@ -14,6 +14,7 @@
  void striped_closed_polyline();
  void octagon();
  void group_shape();
+ void draw_Binary_tree();
 
  int chapter14()
 try
@@ -34,7 +35,8 @@ try
     //striped_circle();
     //striped_closed_polyline();
     //octagon();
-    //group_shape();
+  //  group_shape();
+     draw_Binary_tree();
     return 0;
 }
 catch(exception & e)
@@ -48,38 +50,70 @@ catch(...)
     keep_window_open();
 }
 
+void draw_Binary_tree()
+{
+    using Graph_lib::Point;
+    Graph_lib::Simple_window win(Graph_lib::Point(100, 100),
+        width_window - 1000, height_window - 500, "My window");
+    
+    //Graph_lib::Binary_tree_triangle s(5, 20);
+    //win.attach(s);
+    Graph_lib::Binary_tree bt(7, 30);
+    //bt.move()
+    bt.c[3].set_fill_color(Graph_lib::Color::cyan);
+
+    win.attach(bt);
+    win.wait_for_button();
+}
+
 void group_shape()
 {
-    using namespace Graph_lib;
-    Graph_lib::Simple_window win(Point(100,100),
+   // using namespace Graph_lib;
+    Graph_lib::Simple_window win(Graph_lib::Point(100,100),
                     width_window-1000,height_window-500,"My window");
     Graph_lib::Group gr;
     //Graph_lib::Rectangle s(Graph_lib::Rectangle(Point(100,100),40,40));
     for(int dy=0; dy<480; dy+=40)
         for(int dx=0; dx<480; dx+=40){
-            gr.add_Shape(new Graph_lib::Rectangle(Point(100+dx,100+dy),40,40));
+            gr.add_Shape(new Graph_lib::Rectangle(Graph_lib::Point(100+dx,100+dy),40,40));
         }
 
     for(int s=0, odd=0; s<gr.size(); s++){
         if(!(s%12))
             odd++;
         if(s%2 && odd%2 || (((s+1)%2)) && !(odd%2)){
-            gr[s].set_fill_color(Color::blue);
+            gr[s].set_fill_color(Graph_lib::Color::blue);
         }
         else{
-            gr[s].set_fill_color(Color::black);
+            gr[s].set_fill_color(Graph_lib::Color::black);
         }
 
     }
-
-
-
     //gr.add_Shape(s);
 
-    for(int i = 0; i<gr.size(); i++)
-        win.attach(gr[i]);
-
+    /*
+    for (int i = 0; i<gr.size(); i++)
+       win.attach(gr[i]);
+       */
+   
+    win.attach(gr);
     win.wait_for_button();
+   
+    gr.move(50, 50);
+
+    for (int s = 0, odd = 0; s < gr.size(); s++) {
+        if (!(s % 12))
+            odd++;
+        if (s % 2 && odd % 2 || (((s + 1) % 2)) && !(odd % 2)) {
+            gr[s].set_fill_color(Graph_lib::Color::cyan);
+        }
+        else {
+            gr[s].set_fill_color(Graph_lib::Color::dark_green);
+        }
+
+    }
+    win.wait_for_button();
+    
 }
 
 void octagon()
@@ -175,8 +209,10 @@ void Smiley_Frowny()
     Graph_lib::Simple_window win(Point(100,100), width_window-1000,height_window-500,"My window");
     Smiley m(Point(100,100), 50);
     Frowny fy(Point(200,100), 50);
-    win.attach(m);
-    win.attach(fy);
+    Smiley_hat sh(Point(300, 100), 50);
+    win.attach(sh);
+    //win.attach(m);
+    //win.attach(fy);
 
     //Smiley_hat sh(Point(300,200), 50);
     //win.attach(sh);

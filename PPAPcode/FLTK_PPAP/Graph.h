@@ -228,7 +228,7 @@ struct Rectangle : Shape {
 		if (h<=0 || w<=0) error("Bad rectangle: first point is not top left");
 		add(x);
 	}
-	void draw_lines() const;
+	virtual void draw_lines() const  override;
 
 //	void set_fill_color(Color col) { fcolor = col; }
 //	Color fill_color() { return fcolor; }
@@ -714,8 +714,8 @@ struct Group : public Shape
 public:
 //    Group(){};
     void add_Shape(Shape* s){ shape_v.push_back(s); }
-	void draw() const;					// deal with color and draw_lines
-	virtual void move(int dx, int dy) override;	// move the shape +=dx and +=dy
+	//void draw() const;					// deal with color and draw_lines
+	virtual void move(int dx, int dy);// override;	// move the shape +=dx and +=dy
 
 	void set_color(Color col);
 
@@ -724,15 +724,71 @@ public:
 	void set_fill_color(Color col);
 
     int size() const { return shape_v.size(); };
-    Shape& operator[](int n)  { return shape_v[n]; }
-    const  Shape& operator[](int n) const  { return shape_v[n]; }
+	Shape& operator[](int n) {
+		if (shape_v.size() > n) return shape_v[n];
+		throw std::runtime_error("shape_v[n] - Group::size() < n");
+	}
+    const  Shape& operator[](int n) const  { 
+		if (shape_v.size() > n)return shape_v[n]; 
+		throw std::runtime_error("shape_v[n] - Group::size() < n");
+	}
     virtual ~Group() {}
 private:
     Vector_ref<Shape> shape_v;
-    using Shape::point;
-    using Shape::number_of_points;
-    using Shape::set_point;
-    //virtual void draw_lines() const;
+   //using Shape::point;
+  // using Shape::number_of_points;
+   //using Shape::set_point;
+   virtual void draw_lines() const;
+};
+
+
+class Binary_tree :public Shape
+{
+protected:
+	int lvls;
+	
+	Point pbottom_lvl{ 300, 50 };
+	int shape_size; // [pixels]	
+	const int dx =2 * shape_size;
+	const int dy = 2 * shape_size;
+	int c_count_bottom_lvl=0; // how many circles in lvl, // (2^n)/2
+	int bottom_lvl=0; 
+private:
+	// centre circles from lvl to root 
+	void ccentre(int lvl, int pixels);
+	void add_arrows(int s);
+public:
+	Group c; // node shape: circle
+	Group a; // arrows
+	Binary_tree(int size = 20, Point pnorthwest = Point(300, 50)) : lvls(0), shape_size(size) { add(pnorthwest); };
+	Binary_tree(int levels, int size, Point pnorthwest = Point(300, 50));
+	virtual void add_lvl_left();  // to change or remove
+	virtual void add_lvl_center(); // to change or remove
+	virtual void add_lvl(); // change to  reccursion function
+	
+
+	virtual void draw_lines() const override;
+
+};
+
+
+
+
+class Binary_tree_triangle : public Binary_tree
+{
+private:
+	// centre circles from lvl to root 
+	void ccentre(int lvl, int pixels);
+public:
+	Binary_tree_triangle(int size=20):Binary_tree(0,size) {};
+	Binary_tree_triangle(int levels, int size=20);
+	virtual void add_lvl_left();
+	virtual void add_lvl_center();
+	virtual void add_lvl();
+
+
+	virtual void draw_lines() const override;
+
 };
 
 
