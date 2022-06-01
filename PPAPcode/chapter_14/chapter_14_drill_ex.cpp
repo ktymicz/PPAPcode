@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <memory>
 #include "Simple_window.h" // get access to our window library
 #include "Graph.h"
 
@@ -15,6 +16,72 @@
  void octagon();
  void group_shape();
  void draw_Binary_tree();
+ void printIterator();
+ 
+ class Iterators
+ {
+ public:
+     Iterators(){}
+     virtual double* next() = 0;
+     
+ };
+
+ class Vector_iterator : public Iterators
+ {
+     
+ public:
+     Vector_iterator(double d)  {v.push_back(d); }
+     virtual double* next() 
+     {
+         return  v.size() ? &v.front(): nullptr;
+     }
+     std::vector<double> v;
+     virtual ~Vector_iterator() {}
+ };
+
+ class List_iterator : public Iterators
+ {
+     
+ public:
+     List_iterator(double s) { l.push_back(s); }
+     virtual double* next() 
+     {
+         return l.size() ?  &l.front() : nullptr;
+     }
+     std::list<double> l;
+     
+     virtual ~List_iterator() {}
+ };
+
+
+
+ class A
+ {
+ public:
+     
+     A() {}
+     virtual double g() = 0;
+ };
+
+ class B:public A
+ {
+     double d;
+ public:
+
+     B(double dd) :d{ dd } {}
+     virtual double g() { return d; }
+ };
+
+ class C :public A
+ {
+     double d;
+ public:
+
+     C(double dd) :d{ dd } {}
+     virtual double g() { return d; }
+ };
+
+
 
  int chapter14()
 try
@@ -35,8 +102,9 @@ try
     //striped_circle();
     //striped_closed_polyline();
     //octagon();
-  //  group_shape();
-     draw_Binary_tree();
+    //group_shape();
+     //draw_Binary_tree();
+     printIterator();
     return 0;
 }
 catch(exception & e)
@@ -50,7 +118,38 @@ catch(...)
     keep_window_open();
 }
 
-void draw_Binary_tree()
+void printIterator()
+{
+
+    //std::vector<std::unique_ptr<A>> a;
+    //for (int c = 0; c < 6;)
+    //{
+    //    a.push_back(std::make_unique<B>(2.5+c));
+    //    c++;
+    //    a.push_back(std::make_unique<C>(2.5 + c));
+    //    c++;
+    //
+    //}
+    //for(auto& v:a)
+    //    std::cout << "ss" << (v->g()) << '\n';
+
+    
+    //std::unique_ptr<List_iterator> s = std::make_unique<List_iterator>(2.6);
+    
+    std::vector<std::unique_ptr<Iterators>> s;
+    for (int c = 0; c < 6;)
+    {
+        s.push_back(std::make_unique<List_iterator>(2.5+c));
+        c++;
+        s.push_back(std::make_unique<Vector_iterator>(2.5 + c));
+        c++;
+    }
+    for(auto& v: s)
+        std::cout << "ss" << *(v->next()) << '\n';
+
+}
+
+void draw_Binary_tree() // 11,12,14
 {
     using Graph_lib::Point;
     Graph_lib::Simple_window win(Graph_lib::Point(100, 100),
@@ -58,11 +157,13 @@ void draw_Binary_tree()
     
     //Graph_lib::Binary_tree_triangle s(5, 20);
     //win.attach(s);
-    Graph_lib::Binary_tree bt(7, 30);
-    //bt.move()
-    bt.c[3].set_fill_color(Graph_lib::Color::cyan);
-
+    Graph_lib::Binary_tree bt(6, 50, Point(200,50));
+    for(int count=0; count<bt.c.size(); count++)
+        bt.c[count].set_fill_color(fl_color_cube(4, 7, 1));
+    
     win.attach(bt);
+        //bt.move()
+
     win.wait_for_button();
 }
 
@@ -143,10 +244,10 @@ void striped_closed_polyline()
     Striped_closed_polyline scp;
     scp.set_fill_color(fl_color_cube(0,7,1));
     scp.set_color(fl_color_cube(0,0,5));
-    scp.add(Point{100,100});
+    scp.add(Point{80,80});
     scp.add(Point{120, 120});
-    scp.add(Point{145, 130});
-    scp.add( Point{90,145});
+    scp.add(Point{200, 150});
+    scp.add( Point{10,130});
 
     win.attach(scp);
 

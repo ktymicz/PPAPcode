@@ -1087,7 +1087,7 @@ void Striped_closed_polyline::draw_lines() const
             if(x_min>point(n).x) x_min = point(n).x;
             if(x_max<point(n).x) x_max = point(n).x;
             if(y_min>point(n).y) y_min = point(n).y;
-            if(y_min<point(n).y) y_max = point(n).y;
+            if(y_max<point(n).y) y_max = point(n).y;
         }
         std::cout << x_min << ' ' << x_max << ' '
                   << y_min << ' ' << y_max << '\n';
@@ -1108,7 +1108,7 @@ void Striped_closed_polyline::draw_lines() const
             //sort()
             for(int i = 1; i<inters_vect.size(); i++){
                 fl_line(inters_vect[i-1].x, inters_vect[i-1].y, inters_vect[i].x, inters_vect[i].y);
-                Sleep(100);
+                Sleep(50);
             }
         }
 
@@ -1200,57 +1200,39 @@ void Striped_closed_polyline::draw_lines() const
     }
 
 
+ //---------------------------------------------------------------------------------
+
 Binary_tree::Binary_tree(int levels, int size, Point pnorthwest)
     : lvls(levels), shape_size{ size }
 {
     add(pnorthwest);
-
+    pbottom_lvl.y = point(0).y + 0.5 * shape_size;
     int shape_count = pow(2, lvls-1); // size for the c 
-    int xsoutheast = dx * (shape_count) + point(0).x-shape_size;
-    int ysoutheast = dy * (lvls-1 ) + point(0).y + shape_size;
-    //std::cout << "x:" << xsoutheast << "y:" << ysoutheast << '\n';
-    //std::cout << "x:" << pnorthwest.x << "y:" << pnorthwest.y << '\n';
-    Point psoutheast(xsoutheast, ysoutheast);
-    add(psoutheast);
-    int xmid = (psoutheast.x - pnorthwest.x)/2 + point(0).x;
-    int ymid = (psoutheast.y - pnorthwest.y)/2 + point(0).y;
-    add(Point(xmid, ymid));
-    pbottom_lvl.x = xmid;
-    pbottom_lvl.y = point(0).y+0.5*shape_size;
-    a.add_Shape(new Graph_lib::Mark(pnorthwest, 'x'));
-    a.add_Shape(new Graph_lib::Mark(psoutheast, 'x'));
     while (shape_count >c.size())
     {
-        add_lvl_center();
+        add_lvl();
     }
+    //print_pmid_psoutheast();// points mid, southeast
  }
 
 
-void Binary_tree::add_lvl_center()
+void Binary_tree::add_lvl()
 {
-    c_count_bottom_lvl = pow(2, bottom_lvl); // how many circles at the bottom lvl
+    int c_count_bottom_lvl = pow(2, bottom_lvl); // how many circles at the bottom lvl, // (2^n)/2
+    pbottom_lvl.x = point(0).x + shape_size * (pow(2, lvls - 1 - bottom_lvl) - 1) + 0.5 * shape_size;
     int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-    // 
-    int coefficient_lvl = 1;
-    if (lvls-1 > bottom_lvl)
-    {
-        coefficient_lvl = pow(2, lvls - 1 - bottom_lvl);// (lvls-1-bottom_lvl);
-
-    }
     int dxc = 0;
     // add circles
     for (int count = 0; count < c_count_bottom_lvl; count++) {
         c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size / 2));
         c.set_color(Graph_lib::Color::blue);
-        dxc += shape_size* pow(2, lvls  - bottom_lvl);// +dx * (lvls - 1 - bottom_lvl);
+        dxc += shape_size* pow(2, lvls  - bottom_lvl);
     }
-    //std::cout << s((const Circle&)c[0]).x << '\n';
-    // move parent circle , and upper arrows
-
-
-    // add arrows
+    
+    int dxt = shape_size * 0.25; // difference for text in x
+    int dyt = shape_size * 0.6;   // difference for text in y
     if (csize > 0) {
+        // add arrows
         int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
        // std::cout << "nodes: " << pnodes << '\n';
         for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
@@ -1259,59 +1241,48 @@ void Binary_tree::add_lvl_center()
             if (count % 2)
                 node++;
         }
+        
+        // add Text
+        std::string ct = "l"; // text
+        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
+            gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[csize + count]).point(0).x + dxt, ((const Circle&)c[csize + count]).point(0).y + dyt), ((const Text&)gtext[csize - pnodes+node]).label() + ct));
+            gtext.set_color(Graph_lib::Color::blue);
+            if (count % 2)
+                ct = "l";
+            else
+                ct = "r";
+            if (count % 2)
+                node++;
+        }
+    } 
+    else {
+        gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[0]).point(0).x+dxt, ((const Circle&)c[0]).point(0).y+dyt), std::string("rl")));
+        gtext.set_color(Graph_lib::Color::blue);
     }
-    
-    
-    //pbottom_lvl.x = point(0).x + 0.75*dx + dx*(lvls-3-bottom_lvl);
-    
-    // update variables to default values for the next add_lvl
+    // update variables values
     bottom_lvl++;
-    int s = shape_size * (pow(2, lvls - 1 - bottom_lvl) - 1);
-    pbottom_lvl.x = point(0).x + shape_size*(pow(2, lvls-1-bottom_lvl)-1) + 0.5 * shape_size;
-    std::cout << "bottom_lvl:" << bottom_lvl << '\n'
-        << "coef:" << coefficient_lvl << '\n'
-        << "s" << s << '\n';
-    
-    if (bottom_lvl == lvls-1)
-        pbottom_lvl.x = point(0).x + 0.5*shape_size;
-    
-    pbottom_lvl.y += dy;
+    pbottom_lvl.y += 2*shape_size;
 }
 
-
-void Binary_tree::add_lvl()
+void Binary_tree::print_pmid_psoutheast() const
 {
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
-    int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-
-    // add circles
-    int dxc=0;
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size / 2));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += dx;
-    }
-    //std::cout << s((const Circle&)c[0]).x << '\n';
-    // move parent circle , and upper arrows
-
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-       // std::cout << "nodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
-            a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-            a.set_color(Graph_lib::Color::blue);
-            if (count % 2)
-                node++;
-        }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-    pbottom_lvl.x -= dxc / 2;
-    pbottom_lvl.y += dy;
+    int shape_count = pow(2, lvls - 1);
+    Point psoutheast(0, 0);
+    int last_lvl = lvls - 1;
+    int differencex = shape_size * pow(2, lvls - (last_lvl));
+    int differencey = 2 * shape_size; // const 
+    psoutheast.x = differencex * (shape_count)+point(0).x - shape_size;
+    psoutheast.y = differencey * (lvls - 1) + point(0).y + shape_size;  
+    int xmid = (psoutheast.x - point(0).x) / 2 + point(0).x;
+    int ymid = (psoutheast.y - point(0).y) / 2 + point(0).y;
+    std::cout << "southeast x:" << psoutheast.x << "y:" << psoutheast.y << '\n';
+    std::cout << "northwest x:" <<point(0).x << "y:" << point(0).y << '\n';
+    // Graphic visual for the points, if you need it, remove const from function declaration
+    //a.add_Shape(new Graph_lib::Mark(point(0), 'x'));
+    //a.add_Shape(new Graph_lib::Mark(psoutheast, 'x'));
+   
 }
+
 
 void Binary_tree::add_arrows(int s)
 {}
@@ -1323,137 +1294,48 @@ void Binary_tree::ccentre(int lvl, int pixels)
 
 }
 
-
 void Binary_tree::draw_lines() const
 {
     for (int i = 0; i < a.size(); i++)
         a[i].draw();
     for (int i = 0; i < c.size(); i++)
         c[i].draw();
+    for (int i = 0; i < gtext.size(); i++)
+        gtext[i].draw();
+
 }
 
+//----------------------------------------------------------------------------------
 
-void Binary_tree::add_lvl_left()
-{
-    c_count_bottom_lvl = pow(2, bottom_lvl-1); // how many circles at the bottom lvl
-    int csize = c.size();
-    std::cout << "before csize:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-    int dxc = 0;
-    // add circles
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x+dxc, pbottom_lvl.y), shape_size));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += dx;
-    }
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-        std::cout << "pnodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {        
-                a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-                a.set_color(Graph_lib::Color::blue);
-                if (count % 2)
-                    node++;
-       }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-   
-    pbottom_lvl.y += dy;
-}
-
-
-
-
-
-Binary_tree_triangle::Binary_tree_triangle(int levels, int size)
-    : Binary_tree(size)
+Binary_tree_triangle::Binary_tree_triangle(int levels, int size, Point pnorthwest)
+    : Binary_tree(size, pnorthwest)
 {
     lvls = {levels };
     int shape_count = pow(2, lvls) - 1;
+    add(pnorthwest);
+    pbottom_lvl.y = point(0).y + shape_size;
     while (shape_count > c.size())
     {
         add_lvl();
     }
 }
 
-void Binary_tree_triangle::add_lvl_left()
-{
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
-    int csize = c.size();
-    std::cout << "before csize:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-    int dxc = 0;
-    // add circles
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += 3 * shape_size;
-    }
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-        std::cout << "pnodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
-            a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-            a.set_color(Graph_lib::Color::blue);
-            if (count % 2)
-                node++;
-        }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-    pbottom_lvl.y += dy;
-}
-
-void Binary_tree_triangle::add_lvl_center()
-{
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
-    int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-
-    int dxc = 0;
-    // add circles
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += 3 * shape_size;
-    }
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-       // std::cout << "nodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
-            a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-            a.set_color(Graph_lib::Color::blue);
-            if (count % 2)
-                node++;
-        }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-    pbottom_lvl.x -= dx / 2 - 3 * shape_size / 2;
-    pbottom_lvl.y += dy;
-}
 
 void Binary_tree_triangle::add_lvl()
 {
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
+    int c_count_bottom_lvl = pow(2, bottom_lvl); // how many triangles at the bottom lvl // (2^n)/2
+    int ang_bac = 30;
+    double theta = ang_bac * PI / 180;
+    pbottom_lvl.x = point(0).x + shape_size * (pow(2, lvls - 1 - bottom_lvl) - 1) +(shape_size/cos(theta)); // it's aproximation
     int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-
     int dxc = 0;
     // add circles
     for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Regular_polygon(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size, 3, 30));
+        // THere is need to correct shape_size value for Regular_polygon(...dis_center!=shape_size,...)
+        c.add_Shape(new Graph_lib::Regular_polygon(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size, 3, ang_bac));
         c.set_color(Graph_lib::Color::blue);
-        dxc += dx;
+        dxc += shape_size * pow(2, lvls - bottom_lvl);
     }
-    //std::cout << s((const Circle&)c[0]).x << '\n';
-    // move parent circle , and upper arrows
-
 /*
     // add arrows
     if (csize > 0) {
@@ -1469,14 +1351,12 @@ void Binary_tree_triangle::add_lvl()
     */
     // update variables to default values for the next add_lvl
     bottom_lvl++;
-    pbottom_lvl.x -= dx / 2 - 3 * shape_size / 2;
-    pbottom_lvl.y += dy;
+    pbottom_lvl.y += shape_size*2;
 }
 
 void Binary_tree_triangle::ccentre(int lvl, int pixels)
 {
     int c_count_move = pow(2, lvl - 1);
-
 
 }
 
@@ -1491,6 +1371,6 @@ void Binary_tree_triangle::draw_lines() const
         c[i].draw();
 }
 
-
+//---------------------------------------------------------------------------------
 
 } // Graph

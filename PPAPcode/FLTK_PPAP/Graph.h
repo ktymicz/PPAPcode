@@ -707,6 +707,7 @@ protected:
     //void add(Point p){ Regular_polygon::add(p); }
     using Regular_polygon::add;
 };
+//---------------------------------------------------------------------------------
 
 struct Group : public Shape
 {
@@ -740,31 +741,27 @@ private:
    //using Shape::set_point;
    virtual void draw_lines() const;
 };
-
+//---------------------------------------------------------------------------------
 
 class Binary_tree :public Shape
 {
 protected:
 	int lvls;
-	
-	Point pbottom_lvl{ 300, 50 };
+	std::string ctext{"rl"};
+	Point pbottom_lvl{ 0,0 };
 	int shape_size; // [pixels]	
-	const int dx =2 * shape_size;
-	const int dy = 2 * shape_size;
-	int c_count_bottom_lvl=0; // how many circles in lvl, // (2^n)/2
 	int bottom_lvl=0; 
-private:
 	// centre circles from lvl to root 
 	void ccentre(int lvl, int pixels);
 	void add_arrows(int s);
+	void print_pmid_psoutheast() const;
 public:
 	Group c; // node shape: circle
 	Group a; // arrows
-	Binary_tree(int size = 20, Point pnorthwest = Point(300, 50)) : lvls(0), shape_size(size) { add(pnorthwest); };
-	Binary_tree(int levels, int size, Point pnorthwest = Point(300, 50));
-	virtual void add_lvl_left();  // to change or remove
-	virtual void add_lvl_center(); // to change or remove
-	virtual void add_lvl(); // change to  reccursion function
+	Group gtext;
+	Binary_tree(int size = 20, Point pnorthwest = Point(0, 0)) : lvls(0), shape_size(size) { add(pnorthwest); };
+	Binary_tree(int levels, int size, Point pnorthwest = Point(0, 0));
+	virtual void add_lvl(); // // ...change to  reccursion function ??, maybe not??
 	
 
 	virtual void draw_lines() const override;
@@ -772,7 +769,7 @@ public:
 };
 
 
-
+//---------------------------------------------------------------------------------
 
 class Binary_tree_triangle : public Binary_tree
 {
@@ -781,9 +778,7 @@ private:
 	void ccentre(int lvl, int pixels);
 public:
 	Binary_tree_triangle(int size=20):Binary_tree(0,size) {};
-	Binary_tree_triangle(int levels, int size=20);
-	virtual void add_lvl_left();
-	virtual void add_lvl_center();
+	Binary_tree_triangle(int levels, int size=20, Point pnorthwest = Point{0,0});
 	virtual void add_lvl();
 
 
