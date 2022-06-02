@@ -28,12 +28,17 @@
 
  class Vector_iterator : public Iterators
  {
-     
+     long num{0};
  public:
-     Vector_iterator(double d)  {v.push_back(d); }
+     Vector_iterator(std::vector<double> vec) : v { vec } {  }
      virtual double* next() 
      {
-         return  v.size() ? &v.front(): nullptr;
+         return  ((v.size()-num) > 0) ? &v[num++] : nullptr;
+        
+         // if (v.size() - num > 0) {
+         //    return   &v[num++];
+         //}
+         //return nullptr;
      }
      std::vector<double> v;
      virtual ~Vector_iterator() {}
@@ -41,13 +46,24 @@
 
  class List_iterator : public Iterators
  {
-     
+     long num{0};
+     std::list<double>::iterator it;
  public:
-     List_iterator(double s) { l.push_back(s); }
-     virtual double* next() 
-     {
-         return l.size() ?  &l.front() : nullptr;
+     List_iterator(std::list<double> list) : l{ list } { 
+         it =  l.begin() ;
      }
+     virtual double* next() 
+     {       
+         if (l.size() - num > 0) {
+             double* temp = &*it;
+             num++;
+             it++;
+             return  temp;
+           }
+         return nullptr;
+         
+     }
+    
      std::list<double> l;
      
      virtual ~List_iterator() {}
@@ -136,16 +152,40 @@ void printIterator()
     
     //std::unique_ptr<List_iterator> s = std::make_unique<List_iterator>(2.6);
     
+    std::list<double>s2{ 3.5 };
+    std::list<double>s3;
+    std::vector<double>s4{3.5,4.5,5.5};
+    
     std::vector<std::unique_ptr<Iterators>> s;
+    s.push_back(std::make_unique<List_iterator>(s2));
+    s.push_back(std::make_unique<List_iterator>(s3));
+    s.push_back(std::make_unique<Vector_iterator>(s4));
     for (int c = 0; c < 6;)
     {
-        s.push_back(std::make_unique<List_iterator>(2.5+c));
+        s.push_back(std::make_unique<List_iterator>(std::list<double> {c+2.5, c+3.5, c+4.5}));
+        
         c++;
-        s.push_back(std::make_unique<Vector_iterator>(2.5 + c));
+        s.push_back(std::make_unique<Vector_iterator>(std::vector<double> { c + 2.6, c + 3.6, c + 4.6 }));
         c++;
+        
     }
-    for(auto& v: s)
-        std::cout << "ss" << *(v->next()) << '\n';
+    //Using Abstract class  pointer to derived class to call (v->next()) ;
+    for (auto& v : s)
+    {
+        double* ptemp = v->next();
+        do{
+            
+        if (ptemp == nullptr)
+            std::cout << " next() returns address: nullptr" << '\n';
+        else
+            std::cout << " next() returns address: " << *ptemp << '\n';
+            ptemp = v->next();
+        } while (ptemp != nullptr);
+
+
+    }
+        
+
 
 }
 
