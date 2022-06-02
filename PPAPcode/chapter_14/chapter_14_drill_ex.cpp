@@ -69,6 +69,7 @@
      virtual ~List_iterator() {}
  };
 
+ void print(Iterators& it);
 
 
  class A
@@ -134,6 +135,20 @@ catch(...)
     keep_window_open();
 }
 
+void print(Iterators& it)
+{
+    double* ptemp = it.next();
+    do {
+
+        if (ptemp == nullptr)
+            std::cout << " next() returns address: nullptr" << '\n';
+        else
+            std::cout << " next() returns address: " << *ptemp << '\n';
+        ptemp = it.next();
+    } while (ptemp != nullptr);
+
+}
+
 void printIterator()
 {
 
@@ -172,17 +187,7 @@ void printIterator()
     //Using Abstract class  pointer to derived class to call (v->next()) ;
     for (auto& v : s)
     {
-        double* ptemp = v->next();
-        do{
-            
-        if (ptemp == nullptr)
-            std::cout << " next() returns address: nullptr" << '\n';
-        else
-            std::cout << " next() returns address: " << *ptemp << '\n';
-            ptemp = v->next();
-        } while (ptemp != nullptr);
-
-
+        print(*v);
     }
         
 
