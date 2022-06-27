@@ -71,7 +71,7 @@ void draw_Superelipse(double a, double b, double m, double n, int N);
 
 
 
-int chapter12()
+int chapter_12_drill_ex()
 try
 {
 

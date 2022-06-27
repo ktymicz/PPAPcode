@@ -22,6 +22,7 @@
     <ClCompile Include="chapter_12\chapter_12_drill_ex.cpp" />
     <ClCompile Include="chapter_13\chapter_13_drill_ex.cpp" />
     <ClCompile Include="chapter_14\chapter_14_drill_ex.cpp" />
+    <ClCompile Include="chapter_15_drill_ex.cpp" />
     <ClCompile Include="FLTK_PPAP\Graph.cpp" />
     <ClCompile Include="FLTK_PPAP\GUI.cpp" />
     <ClCompile Include="FLTK_PPAP\Window.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="FLTK_PPAP\Simple_window.h" />
     <ClInclude Include="FLTK_PPAP\std_lib_facilities.h" />
     <ClInclude Include="FLTK_PPAP\Window.h" />
+    <ClInclude Include="Test.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -146,6 +148,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\voniu\source\repos\ktymicz\PPAPcode\PPAPcode\FLTK_PPAP;C:\fltk-1.3.8;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

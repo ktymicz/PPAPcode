@@ -987,8 +987,8 @@ void Smiley_hat::draw_lines() const
         // drawing line
         fl_line(point(0).x-radius(),point(0).y+radius(),point(0).x+3*radius(),point(0).y+radius());
         // drawing arc
-        fl_arc(point(0).x , point(0).y,
-               radius()*6, radius()*6 , 0, 360);
+        //fl_arc(point(0).x , point(0).y,
+        //       radius()*6, radius()*6 , 0, 360);
     }
 }
 
@@ -1034,13 +1034,21 @@ void Frowny::draw_lines() const
 
 void Striped_rectangle::draw_lines() const
 {
+    static int start{};
     if(fill_color().visibility()){
         fl_color(fill_color().as_int());
-        for(int h=1; h<height(); h++){
-            fl_line(point(0).x+1, point(0).y+h, point(0).x+width()-1, point(0).y+h);
-            Sleep(10);      // [miliseconds]
+        if (start) {
+            for (int h = 1; h < height(); h++) {
+                fl_line(point(0).x + 1, point(0).y + h, point(0).x + width() - 1, point(0).y + h);
+            }
         }
-
+        else {
+            for (int h = 1; h < height(); h++) {
+                fl_line(point(0).x + 1, point(0).y + h, point(0).x + width() - 1, point(0).y + h);
+                Sleep(10);      // [miliseconds]
+            }
+            start = 1;
+        }
         fl_color(color().as_int());
     }
 
@@ -1049,22 +1057,33 @@ void Striped_rectangle::draw_lines() const
         fl_color(color().as_int());
         fl_rect(point(0).x, point(0).y, width(), height());
     }
-
+    
 }
 
 // drawing in x-direction, horizontal
 //
 void Striped_circle::draw_lines() const
 {
+    static int start{};
     if(fill_color().visibility()){
         fl_color(fill_color().as_int());
-        // for fill and not fill line dify+=2
-        for(int dify=-radius(); dify<radius(); dify++){
+        if (start) {
+            // for fill and not fill line dify+=2
+            for (int dify = -radius(); dify < radius(); dify++) {
                 // (x-x0)^2 + (y-y0)^2 = r^2 - circle on x,y, x0, y0 == 0
-            int difx = round(sqrt(radius()*radius()-dify*dify))-1;
-            fl_line(center().x-difx,center().y+dify, center().x+difx, center().y+dify);
-            Sleep(100); // [miliseconds]
+                int difx = round(sqrt(radius() * radius() - dify * dify)) - 1;
+                fl_line(center().x - difx, center().y + dify, center().x + difx, center().y + dify);
+            }
         }
+        else {            
+            for (int dify = -radius(); dify < radius(); dify++) {
+                int difx = round(sqrt(radius() * radius() - dify * dify)) - 1;
+                fl_line(center().x - difx, center().y + dify, center().x + difx, center().y + dify);
+                Sleep(10); // [miliseconds]
+            }
+            start = 1;
+        }
+        
         fl_color(color().as_int());
     }
 
@@ -1082,7 +1101,8 @@ void Striped_closed_polyline::draw_lines() const
         int x_max = point(0).x;
         int y_min = point(0).y;
         int y_max = point(0).y;
-
+        static int start{};
+        //static int change{};
         for(int n = 0; n<number_of_points(); n++){
             if(x_min>point(n).x) x_min = point(n).x;
             if(x_max<point(n).x) x_max = point(n).x;
@@ -1093,6 +1113,7 @@ void Striped_closed_polyline::draw_lines() const
                   << y_min << ' ' << y_max << '\n';
         x_min-=10;
         x_max+=10;
+
         for(int y = y_min; y<y_max; y+=2){
             Point intersection;
             std::vector<Point> inters_vect;
@@ -1105,15 +1126,22 @@ void Striped_closed_polyline::draw_lines() const
                 inters_vect.push_back(intersection);
 
             //
-            //sort()
-            for(int i = 1; i<inters_vect.size(); i++){
-                fl_line(inters_vect[i-1].x, inters_vect[i-1].y, inters_vect[i].x, inters_vect[i].y);
-                Sleep(50);
+                //sort()
+            if (start) {
+                for (int i = 1; i < inters_vect.size(); i++) {
+                        fl_line(inters_vect[i - 1].x, inters_vect[i - 1].y, inters_vect[i].x, inters_vect[i].y);
+                }
             }
+            else {
+                for (int i = 1; i < inters_vect.size(); i++) {
+                    fl_line(inters_vect[i - 1].x, inters_vect[i - 1].y, inters_vect[i].x, inters_vect[i].y);
+                    Sleep(20);
+                }
+            }
+
         }
-
-
         //std::cout << "par" << par << " intersection: " <<
+        start = { 1 };
         fl_color(color().as_int());
     }
     if (color().visibility()) {
@@ -1198,10 +1226,44 @@ void Striped_closed_polyline::draw_lines() const
         for (int i = 0; i < size(); i++)
             shape_v[i].draw();
     }
+ //---------------------------------------------------------------------------------
+    Tiles::Tiles(Point p1, Point p2, int slq)
+    {
+        add(p1); // North-West point
+        add(p2); // South-east point
 
+        for (int dy = 0, oddy = 0; dy < point(1).y-point(0).y; dy += slq)
+        {
+            for (int dx = 0, oddx = oddy; dx < point(1).x -point(0).x; dx += slq) {
+                (*this).add_Shape(new Graph_lib::Rectangle(Graph_lib::Point(point(0).x + dx, point(0).y + dy), slq, slq));
+                if (oddx % 2)
+                    (*this)[(*this).size() - 1].set_fill_color(Graph_lib::Color::blue);
+                else
+                    (*this)[(*this).size() - 1].set_fill_color(Graph_lib::Color::black);
+                ++oddx;
+            }
+            ++oddy;
+        }
+    }
+
+    void Tiles::change_color_squares(Fl_Color firstc, Fl_Color secondc)
+    {
+        
+        for (int s = 0, oddy = 0, oddx = 0; s < (*this).size(); s++) {
+            if (oddx % 2)
+                (*this)[s].set_fill_color(firstc);
+            else
+                (*this)[s].set_fill_color(secondc);
+            ++oddx;
+            if ((*this).size() > s + 1 && (*this)[s + 1].point(0).y != (*this)[s].point(0).y) {
+                ++oddy;
+                oddx = oddy;
+            }
+
+        }
+    }
 
  //---------------------------------------------------------------------------------
-
 Binary_tree::Binary_tree(int levels, int size, Point pnorthwest)
     : lvls(levels), shape_size{ size }
 {
@@ -1336,19 +1398,41 @@ void Binary_tree_triangle::add_lvl()
         c.set_color(Graph_lib::Color::blue);
         dxc += shape_size * pow(2, lvls - bottom_lvl);
     }
-/*
+
+    int dxt = shape_size * -1.2; // difference for text in x
+    int dyt = shape_size * -0.5;   // difference for text in y
     // add arrows
     if (csize > 0) {
+
         int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
        // std::cout << "nodes: " << pnodes << '\n';
+        /*
         for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
             a.add_Shape(new Graph_lib::Arrow((const Right_triangle&)c[csize - pnodes + node])->point[], (const Right_triangle&)c[count + csize])));
             a.set_color(Graph_lib::Color::blue);
             if (count % 2)
                 node++;
         }
+*/
+                // add Text
+        std::string ct = "l"; // text
+        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
+            gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[csize + count]).point(0).x + dxt, ((const Circle&)c[csize + count]).point(0).y + dyt), ((const Text&)gtext[csize - pnodes+node]).label() + ct));
+            gtext.set_color(Graph_lib::Color::blue);
+            if (count % 2)
+                ct = "l";
+            else
+                ct = "r";
+            if (count % 2)
+                node++;
+        }
+  
     }
-    */
+    else {
+        gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[0]).point(0).x + dxt, ((const Circle&)c[0]).point(0).y + dyt), std::string("rl")));
+        gtext.set_color(Graph_lib::Color::blue);
+    }
+    
     // update variables to default values for the next add_lvl
     bottom_lvl++;
     pbottom_lvl.y += shape_size*2;
@@ -1367,10 +1451,101 @@ void Binary_tree_triangle::draw_lines() const
     for (int i = 0; i < a.size(); i++)
         a[i].draw();
     */
+    //  draw triangles 
     for (int i = 0; i < c.size(); i++)
         c[i].draw();
+
+    // draw text
+    for (int i = 0; i < c.size(); i++)
+        gtext[i].draw();
+
 }
 
 //---------------------------------------------------------------------------------
+void S_Controller::show() const { 
+    std::cout << "Controller show():\n"
+        << "set on: " << state << '\n'
+        << "level :" << lvl << '\n';
+};
+
+void test_Controller_Status::show() const
+{
+    std::cout << "test_Controller Status show()" << '\n'
+        << "set on: " << state << '\n'
+        << "level :" << lvl << '\n';
+   
+}
+void Controller_Status::show()
+{
+    std::cout << "Controller Status show() is calling to Controller::show()\n";
+    c.show();
+}
+
+//-------------------------
+
+void Shape_Controller::on()
+{
+    shape_p->set_color(Color::visible);
+    shape_p->set_fill_color(Color::visible);
+}
+
+void Shape_Controller::off()
+{
+    shape_p->set_color(Color::invisible);
+    shape_p->set_fill_color(Color::invisible);
+}
+
+void Shape_Controller::set_level(int level)
+{
+    //if (474 > level) shp->set_color(fl_color_cube(level / 100, level / 10, level % 10));
+    if(256>level)
+        shape_p->set_color(level);
+}
+
+void Shape_Controller::set_fill_level(int level)
+{
+    if (256 > level) shape_p->set_fill_color(level);
+}
+
+
+void Shape_Controller::show() const 
+{
+    std::cout << "Shape_Controller is set: " << (( Color::visible == shape_p->color().visibility())? "on":"off") << '\n'
+    << "Color as int: " << shape_p->color().as_int() << '\n'
+    << "Fill color as int: " << shape_p->fill_color().as_int() << '\n';
+}
+
+//---------------------------------------------------------------------------------
+
+Function::Function()
+{
+    for (int i = -70; i < 70; i++) {
+        add(Graph_lib::Point(i + 200, parabola(i) + 100));
+    }
+}
+
+Function::Function(Fct f)
+{
+    for (int i = -70; i < width_window / 6; i++) {
+        add(Graph_lib::Point(i + 300, f(i) + 100));
+    }
+}
+
+Function::Function(Fct f, double r_min, double r_max, Graph_lib::Point xy,
+    int count, double xscale, double yscale)
+{
+    double dis = (r_max - r_min) / count;
+    double r = r_min;
+    for (int i = 0; i < count; i++) {
+        add(Graph_lib::Point(xy.x + xscale * r, xy.y + yscale * f(r)));
+        r += dis;
+    }
+
+}
+void Function::draw_lines() const
+{
+    if (color().visibility())
+        Shape::draw_lines();
+}
 
 } // Graph

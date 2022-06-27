@@ -50,7 +50,7 @@ void  move_mark_Circle();
  // Tile a window with small right triangles
  void tile_right_triangles();
 
-int chapter13()
+int chapter_13_drill_ex()
 try
 {
     using namespace Graph_lib;
@@ -734,7 +734,7 @@ void foci_ellipse()
 
 // ex 12
 // Draw a circle. Move a mark around on the circle , after the "Next" button is pressed
-void  move_mark_Circle()
+void  move_mark_Circle ()
 {
      using namespace Graph_lib;
      Point pWin{50,100};
