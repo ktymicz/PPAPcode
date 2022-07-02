@@ -3,8 +3,8 @@
 #include <math.h>
 #include <functional>
 #include <algorithm>
-#include "Simple_window.h"
-#include "Graph.h"
+#include <imple_window.h>
+#include <Graph.h>
 
 // constants
 constexpr int width_window = 800;//1920/2;

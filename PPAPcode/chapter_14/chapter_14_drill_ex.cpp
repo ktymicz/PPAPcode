@@ -2,8 +2,8 @@
 #include <vector>
 #include <math.h>
 #include <memory>
-#include "Simple_window.h" // get access to our window library
-#include "Graph.h"
+#include <Simple_window.h> // get access to our window library
+#include <Graph.h>
 
  const int width_window = 1920;
  const int height_window = 1080;

@@ -10,8 +10,8 @@
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Image.H>
-#include "std_lib_facilities.h"
-#include "Point.h"
+#include <std_lib_facilities.h>
+#include <Point.h>
 
 namespace Graph_lib {
 // defense against ill-behaved Linux macros:
