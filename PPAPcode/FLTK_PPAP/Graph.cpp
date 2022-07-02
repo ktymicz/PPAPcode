@@ -2,9 +2,11 @@
 #include <FL/Fl_GIF_Image.H>
 #include <FL/Fl_JPEG_Image.H>
 
-#include <Graph.h>
+
 #include<map>
 #include <windows.h>
+
+#include <Graph.h>
 
 namespace Graph_lib {
 
@@ -1517,35 +1519,35 @@ void Shape_Controller::show() const
 
 //---------------------------------------------------------------------------------
 
-Function::Function()
-{
-    for (int i = -70; i < 70; i++) {
-        add(Graph_lib::Point(i + 200, parabola(i) + 100));
-    }
-}
-
-Function::Function(Fct f)
-{
-    for (int i = -70; i < width_window / 6; i++) {
-        add(Graph_lib::Point(i + 300, f(i) + 100));
-    }
-}
-
-Function::Function(Fct f, double r_min, double r_max, Graph_lib::Point xy,
-    int count, double xscale, double yscale)
-{
-    double dis = (r_max - r_min) / count;
-    double r = r_min;
-    for (int i = 0; i < count; i++) {
-        add(Graph_lib::Point(xy.x + xscale * r, xy.y + yscale * f(r)));
-        r += dis;
-    }
-
-}
-void Function::draw_lines() const
-{
-    if (color().visibility())
-        Shape::draw_lines();
-}
+//Function::Function()
+//{
+//    for (int i = -70; i < 70; i++) {
+//        add(Graph_lib::Point(i + 200, parabola(i) + 100));
+//    }
+//}
+//
+//Function::Function(Fct f)
+//{
+//    for (int i = -70; i < width_window / 6; i++) {
+//        add(Graph_lib::Point(i + 300, f(i) + 100));
+//    }
+//}
+//
+//Function::Function(Fct f, double r_min, double r_max, Graph_lib::Point xy,
+//    int count, double xscale, double yscale)
+//{
+//    double dis = (r_max - r_min) / count;
+//    double r = r_min;
+//    for (int i = 0; i < count; i++) {
+//        add(Graph_lib::Point(xy.x + xscale * r, xy.y + yscale * f(r)));
+//        r += dis;
+//    }
+//
+//}
+//void Function::draw_lines() const
+//{
+//    if (color().visibility())
+//        Shape::draw_lines();
+//}
 
 } // Graph

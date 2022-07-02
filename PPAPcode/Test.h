@@ -1,10 +1,10 @@
-#pragma once
-#include <FL/Fl_GIF_Image.H>
-#include <FL/Fl_JPEG_Image.H>
+//#pragma once
+//#include <FL/Fl_GIF_Image.H>
+//#include <FL/Fl_JPEG_Image.H>
 
-#include <Graph.h>
-#include<map>
-#include <windows.h>
+//#include <Graph.h>
+//#include<map>
+//#include <windows.h>
 /*void add_lvl()
 {
     int c_count_bottom_lvl = pow(2, bottom_lvl); // how many circles at the bottom lvl, // (2^n)/2

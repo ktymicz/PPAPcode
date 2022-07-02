@@ -129,6 +129,7 @@ public:
 //------------------------------------------------------------------------------
 
 typedef double Fct(double);
+//using Fct = std::function<double(double)>;
 
 class Shape  {	// deals with color and style, and holds sequence of lines
 protected:
@@ -171,7 +172,7 @@ public:
 	*/
 	//Shape(const Shape&) = delete;
 	//Shape& operator=(const Shape&) = delete;
-private:
+protected:
 	vector<Point> points;	// not used by all shapes
 	Color lcolor {fl_color()};
 	Line_style ls {0};
@@ -186,8 +187,10 @@ private:
 struct Function : Shape {
 	// the function parameters are not stored
 	Function(Fct f, double r1, double r2, Point orig, int count = 100, double xscale = 25, double yscale = 25);
+
 	//Function(Point orig, Fct f, double r1, double r2, int count, double xscale = 1, double yscale = 1);
-};
+public:
+	using Shape::points; // -> it's dangerous game, watch out
 
 //------------------------------------------------------------------------------
 
@@ -865,27 +868,31 @@ public:
 
 //------------------------------------------------------------------------------
 // chapeter 15
+//
+// typedef double Fct(double);
 
-// using types
-using Fct = std::function<double(double)>;
+// using types 
+//using Fct = std::function<double(double)>;
 // functions
-double line4(double i) { return 4; };
-double parabola(double x)
+
+
+ inline double line4(double i) { return 4; };
+inline  double parabola(double x)
 {
 	return x * x;
 }
 
-class Function : public Shape
-{
-
-public:
-	Function();
-	Function(Fct f);
-	Function(Fct f, double range_min, double range_max, Graph_lib::Point xy,
-		int count, double xscale, double yscale);
-	virtual void draw_lines() const override;
-
-};
+//class Function : public Shape
+//{
+//
+//public:
+//	Function2();
+//	Function(Fct f);
+//	Function(Fct f, double range_min, double range_max, Graph_lib::Point xy,
+//		int count, double xscale, double yscale);
+//	virtual void draw_lines() const override;
+//
+//};
 
 
 }
