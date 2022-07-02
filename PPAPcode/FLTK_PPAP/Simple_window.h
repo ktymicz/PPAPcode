@@ -1,5 +1,5 @@
 
-#include "Gui.h"	// for Simple_window only (doesn't really belong in Window.h)
+#include "GUI.h"	// for Simple_window only (doesn't really belong in Window.h)
 
 namespace Graph_lib
 {
