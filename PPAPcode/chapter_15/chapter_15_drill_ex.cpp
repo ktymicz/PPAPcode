@@ -3,8 +3,8 @@
 #include <math.h>
 #include <functional>
 #include <algorithm>
-#include <imple_window.h>
-#include <Graph.h>
+#include "..\FLTK_PPAP\Graph.h" // get access to our graphics library facilities
+#include "..\FLTK_PPAP\Simple_window.h" // get access to our window library
 
 // constants
 constexpr int width_window = 800;//1920/2;

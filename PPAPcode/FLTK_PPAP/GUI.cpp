@@ -1,4 +1,4 @@
-#include "Gui.h"
+#include "GUI.h"
 
 #include <FL/Fl.h>
 #include <FL/Fl_Button.h>
