@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="chapter_12\chapter_12_drill_ex.cpp" />
     <ClCompile Include="FLTK_PPAP\Graph.cpp" />
     <ClCompile Include="FLTK_PPAP\GUI.cpp" />
     <ClCompile Include="FLTK_PPAP\Window.cpp" />
