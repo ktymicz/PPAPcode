@@ -2,6 +2,8 @@
 #ifndef GRAPH_GUARD
 #define GRAPH_GUARD 
 
+#include "std_lib_facilities.h"
+#include "Point.h"
 
 #include<vector>
 #include<string>
@@ -10,8 +12,7 @@
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Image.H>
-#include "std_lib_facilities.h"
-#include "Point.h"
+
 
 namespace Graph_lib {
 // defense against ill-behaved Linux macros:
@@ -191,7 +192,7 @@ struct Function : Shape {
 	//Function(Point orig, Fct f, double r1, double r2, int count, double xscale = 1, double yscale = 1);
 public:
 	using Shape::points; // -> it's dangerous game, watch out
-
+};
 //------------------------------------------------------------------------------
 
 struct Fill {
@@ -897,4 +898,3 @@ inline  double parabola(double x)
 
 }
 #endif
-

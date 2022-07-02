@@ -1,11 +1,11 @@
 #ifndef GUI_GUARD
 #define GUI_GUARD
 
-
+#include "Window.h"
+#include "Graph.h"
 //#include "fltk.h"
 //#include "Point.h"
-#include <Window.h>
-#include <Graph.h>
+
 //#include<vector>
 //#include<string>
 

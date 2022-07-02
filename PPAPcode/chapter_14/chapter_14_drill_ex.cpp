@@ -1,9 +1,12 @@
+#include "..\FLTK_PPAP\Graph.h" // get access to our graphics library facilities
+#include "..\FLTK_PPAP\Simple_window.h" // get access to our window library
+
+
 #include <iostream>
 #include <vector>
 #include <math.h>
 #include <memory>
-#include <Simple_window.h> // get access to our window library
-#include <Graph.h>
+
 
  const int width_window = 1920;
  const int height_window = 1080;
