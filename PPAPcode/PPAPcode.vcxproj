@@ -43,7 +43,6 @@
     <ClInclude Include="FLTK_PPAP\Simple_window.h" />
     <ClInclude Include="FLTK_PPAP\std_lib_facilities.h" />
     <ClInclude Include="FLTK_PPAP\Window.h" />
-    <ClInclude Include="Test.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
