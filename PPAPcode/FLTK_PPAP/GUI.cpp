@@ -1,7 +1,7 @@
 #include <FL/Fl.h>
 #include <FL/Fl_Button.h>
 #include <FL/Fl_Output.h>
-#include <GUI.h>
+#include "Gui.h"
 
 using namespace Graph_lib;
 

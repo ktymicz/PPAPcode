@@ -11,8 +11,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
-#include <Simple_window.h> // get access to our window library
-#include <Graph.h> // get access to our graphics library facilities
+#include "Simple_window.h" // get access to our window library
+#include "Graph.h" // get access to our graphics library facilities
  
 
 const int width_window = 1920;

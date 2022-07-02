@@ -1,12 +1,12 @@
 
+
+#include "Graph.h"
+#include <windows.h>
+#include<map>
 #include <FL/Fl_GIF_Image.H>
 #include <FL/Fl_JPEG_Image.H>
 
 
-#include<map>
-#include <windows.h>
-
-#include <Graph.h>
 
 namespace Graph_lib {
 
