@@ -8,11 +8,14 @@
 // ex 4 Draw a 3-by-3 tic-tac-toe board of alternating white and red squares
 // ex05 // Draw a red ¼-inch frame around a rectangle that is three-quarters the height of your screen and two-thirds the width
 //
+#include "..\FLTK_PPAP\Simple_window.h" // get access to our window library
+#include "..\FLTK_PPAP\Graph.h" // get access to our graphics library facilities
+
 #include <iostream>
 #include <vector>
 #include <math.h>
-#include <Simple_window.h> // get access to our window library
-#include "Graph.h" // get access to our graphics library facilities
+
+
  
 
 const int width_window = 1920;
@@ -71,7 +74,7 @@ void draw_Superelipse(double a, double b, double m, double n, int N);
 
 
 
-int chapter12()
+int chapter_12_drill_ex()
 try
 {
 

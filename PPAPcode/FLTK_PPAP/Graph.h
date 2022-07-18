@@ -2,15 +2,17 @@
 #ifndef GRAPH_GUARD
 #define GRAPH_GUARD 
 
+#include "std_lib_facilities.h"
+#include "Point.h"
 
-//#include<vector>
-//#include<string>
-//#include<cmath>
+#include<vector>
+#include<string>
+#include<cmath>
+#include <functional>
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Image.H>
-#include <std_lib_facilities.h>
-#include <Point.h>
+
 
 namespace Graph_lib {
 // defense against ill-behaved Linux macros:
@@ -29,7 +31,7 @@ struct Color {
 		dark_green=FL_DARK_GREEN, dark_yellow=FL_DARK_YELLOW, dark_blue=FL_DARK_BLUE,
 		dark_magenta=FL_DARK_MAGENTA, dark_cyan=FL_DARK_CYAN
 	};
-	enum Transparency { invisible = 0, visible=255 };
+	enum Transparency { invisible = 0, visible=1 };
 
 	Color(Color_type cc) :c(Fl_Color(cc)), v(visible) { }
 	Color(Color_type cc, Transparency vv) :c(Fl_Color(cc)), v(vv) { }
@@ -128,6 +130,7 @@ public:
 //------------------------------------------------------------------------------
 
 typedef double Fct(double);
+//using Fct = std::function<double(double)>;
 
 class Shape  {	// deals with color and style, and holds sequence of lines
 protected:
@@ -170,7 +173,7 @@ public:
 	*/
 	//Shape(const Shape&) = delete;
 	//Shape& operator=(const Shape&) = delete;
-private:
+protected:
 	vector<Point> points;	// not used by all shapes
 	Color lcolor {fl_color()};
 	Line_style ls {0};
@@ -185,9 +188,11 @@ private:
 struct Function : Shape {
 	// the function parameters are not stored
 	Function(Fct f, double r1, double r2, Point orig, int count = 100, double xscale = 25, double yscale = 25);
-	//Function(Point orig, Fct f, double r1, double r2, int count, double xscale = 1, double yscale = 1);
-};
 
+	//Function(Point orig, Fct f, double r1, double r2, int count, double xscale = 1, double yscale = 1);
+public:
+	using Shape::points; // -> it's dangerous game, watch out
+};
 //------------------------------------------------------------------------------
 
 struct Fill {
@@ -656,7 +661,7 @@ public:
     :   Smiley(p, width)
         //Arc(p,width,2*width,0,180), Smiley(Point{p.x+width/2-width/8, p.y+width/8}, width)
     {}
-private:
+public:
 
      void draw_lines() const override;
 };
@@ -707,10 +712,10 @@ protected:
     //void add(Point p){ Regular_polygon::add(p); }
     using Regular_polygon::add;
 };
+//---------------------------------------------------------------------------------
 
 struct Group : public Shape
 {
-
 public:
 //    Group(){};
     void add_Shape(Shape* s){ shape_v.push_back(s); }
@@ -738,60 +743,158 @@ private:
    //using Shape::point;
   // using Shape::number_of_points;
    //using Shape::set_point;
+protected:
    virtual void draw_lines() const;
 };
+//---------------------------------------------------------------------------------
 
+struct Tiles : public Group
+{
+	Tiles(Point p1, Point p2, int side_length_square);
+	void change_color_squares(Fl_Color firstc, Fl_Color secondc);
+	//virtual void draw_lines() const;
+};
+
+//---------------------------------------------------------------------------------
 
 class Binary_tree :public Shape
 {
 protected:
 	int lvls;
-	
-	Point pbottom_lvl{ 300, 50 };
+	std::string ctext{ "rl" };
+	Point pbottom_lvl{ 0,0 };
 	int shape_size; // [pixels]	
-	const int dx =2 * shape_size;
-	const int dy = 2 * shape_size;
-	int c_count_bottom_lvl=0; // how many circles in lvl, // (2^n)/2
-	int bottom_lvl=0; 
-private:
-	// centre circles from lvl to root 
-	void ccentre(int lvl, int pixels);
-	void add_arrows(int s);
+	int bottom_lvl = 0;
+	 Shape::set_color;
+	 Shape::set_fill_color;
 public:
 	Group c; // node shape: circle
 	Group a; // arrows
-	Binary_tree(int size = 20, Point pnorthwest = Point(300, 50)) : lvls(0), shape_size(size) { add(pnorthwest); };
-	Binary_tree(int levels, int size, Point pnorthwest = Point(300, 50));
-	virtual void add_lvl_left();  // to change or remove
-	virtual void add_lvl_center(); // to change or remove
-	virtual void add_lvl(); // change to  reccursion function
-	
-
+	Group gtext;
+	// default constructor
+	Binary_tree(int size = 20, Point pnorthwest = Point(0, 0)) : lvls(0), shape_size(size) { add(pnorthwest); };
+	Binary_tree(int levels, int size, Point pnorthwest = Point(0, 0));
+	virtual void add_lvl(); // // ...change to  reccursion function ??, maybe not??
 	virtual void draw_lines() const override;
+	
+protected:
+	// centre circles from lvl to root 
+	void ccentre(int lvl, int pixels);
+	void add_arrows(int s);
+	void print_pmid_psoutheast() const;
 
 };
 
 
-
+//---------------------------------------------------------------------------------
 
 class Binary_tree_triangle : public Binary_tree
 {
 private:
-	// centre circles from lvl to root 
+	// centre triangles from lvl to root 
 	void ccentre(int lvl, int pixels);
 public:
 	Binary_tree_triangle(int size=20):Binary_tree(0,size) {};
-	Binary_tree_triangle(int levels, int size=20);
-	virtual void add_lvl_left();
-	virtual void add_lvl_center();
+	Binary_tree_triangle(int levels, int size=20, Point pnorthwest = Point{0,0});
 	virtual void add_lvl();
-
-
 	virtual void draw_lines() const override;
 
 };
 
 
+//---------------------------------------------------------------------------------
+class Controller
+{
+public:
+
+	virtual void on()=0;
+	virtual void off()=0;
+	virtual void set_level(int level)=0;
+	virtual void set_fill_level(int level) = 0;
+	virtual void show() const=0;
+//protected:
+//	Controller(){}
+};
+
+class S_Controller
+{
+protected:
+	int lvl = 0;
+	bool state = false;
+public:
+
+	virtual void on() { state = true; }
+	virtual void off() { state = false; }
+	virtual void set_level(int level) { lvl = level; }
+	virtual void show() const;
+	S_Controller(bool on=true, int level=18) : state(on), lvl(level) { }
+	//protected:
+	//	Controller(){}
+};
+// it is storing a copy of Controller,but any changes to the source S_Controller will not show up, 
+class test_Controller_Status : protected  S_Controller
+{
+
+public:
+	
+	void show() const override;
+	test_Controller_Status(S_Controller& contr) :S_Controller(contr) {}
+	using S_Controller::show;
+	
+};
+
+class Controller_Status 
+{
+private: 
+	const S_Controller& c;
+public:
+	Controller_Status(const S_Controller& contr) :c(contr) {}	
+	void show();
+};
+
+
+
+class Shape_Controller :public Controller
+{
+protected:
+	Shape* shape_p;
+public:
+	virtual void on() override;
+	virtual void off() override;
+	virtual void set_level(int level) override;
+	virtual void set_fill_level(int level) override;
+	virtual void show() const override;
+	Shape_Controller(Shape& s) :shape_p{ &s } {}
+};
+
+//------------------------------------------------------------------------------
+// chapeter 15
+//
+// typedef double Fct(double);
+
+// using types 
+//using Fct = std::function<double(double)>;
+// functions
+
+
+ inline double line4(double i) { return 4; };
+inline  double parabola(double x)
+{
+	return x * x;
+}
+
+//class Function : public Shape
+//{
+//
+//public:
+//	Function2();
+//	Function(Fct f);
+//	Function(Fct f, double range_min, double range_max, Graph_lib::Point xy,
+//		int count, double xscale, double yscale);
+//	virtual void draw_lines() const override;
+//
+//};
+
+
 }
 #endif
-

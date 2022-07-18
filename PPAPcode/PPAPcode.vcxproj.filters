@@ -24,16 +24,19 @@
     <ClCompile Include="FLTK_PPAP\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="chapter_13\chapter_13_drill_ex.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="chapter_12\chapter_12_drill_ex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="chapter_13\chapter_13_drill_ex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="chapter_14\chapter_14_drill_ex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="chapter_15\chapter_15_drill_ex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

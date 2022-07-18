@@ -1,10 +1,14 @@
 
+
+#include "Graph.h"
+//#include <initializer_list>
+#include <windows.h>
+#include<map>
 #include <FL/Fl_GIF_Image.H>
 #include <FL/Fl_JPEG_Image.H>
 
-#include <Graph.h>
-#include<map>
-#include <windows.h>
+
+
 
 namespace Graph_lib {
 
@@ -987,8 +991,8 @@ void Smiley_hat::draw_lines() const
         // drawing line
         fl_line(point(0).x-radius(),point(0).y+radius(),point(0).x+3*radius(),point(0).y+radius());
         // drawing arc
-        fl_arc(point(0).x , point(0).y,
-               radius()*6, radius()*6 , 0, 360);
+        //fl_arc(point(0).x , point(0).y,
+        //       radius()*6, radius()*6 , 0, 360);
     }
 }
 
@@ -1034,13 +1038,21 @@ void Frowny::draw_lines() const
 
 void Striped_rectangle::draw_lines() const
 {
+    static int start{};
     if(fill_color().visibility()){
         fl_color(fill_color().as_int());
-        for(int h=1; h<height(); h++){
-            fl_line(point(0).x+1, point(0).y+h, point(0).x+width()-1, point(0).y+h);
-            Sleep(10);      // [miliseconds]
+        if (start) {
+            for (int h = 1; h < height(); h++) {
+                fl_line(point(0).x + 1, point(0).y + h, point(0).x + width() - 1, point(0).y + h);
+            }
         }
-
+        else {
+            for (int h = 1; h < height(); h++) {
+                fl_line(point(0).x + 1, point(0).y + h, point(0).x + width() - 1, point(0).y + h);
+                Sleep(10);      // [miliseconds]
+            }
+            start = 1;
+        }
         fl_color(color().as_int());
     }
 
@@ -1049,22 +1061,33 @@ void Striped_rectangle::draw_lines() const
         fl_color(color().as_int());
         fl_rect(point(0).x, point(0).y, width(), height());
     }
-
+    
 }
 
 // drawing in x-direction, horizontal
 //
 void Striped_circle::draw_lines() const
 {
+    static int start{};
     if(fill_color().visibility()){
         fl_color(fill_color().as_int());
-        // for fill and not fill line dify+=2
-        for(int dify=-radius(); dify<radius(); dify++){
+        if (start) {
+            // for fill and not fill line dify+=2
+            for (int dify = -radius(); dify < radius(); dify++) {
                 // (x-x0)^2 + (y-y0)^2 = r^2 - circle on x,y, x0, y0 == 0
-            int difx = round(sqrt(radius()*radius()-dify*dify))-1;
-            fl_line(center().x-difx,center().y+dify, center().x+difx, center().y+dify);
-            Sleep(100); // [miliseconds]
+                int difx = round(sqrt(radius() * radius() - dify * dify)) - 1;
+                fl_line(center().x - difx, center().y + dify, center().x + difx, center().y + dify);
+            }
         }
+        else {            
+            for (int dify = -radius(); dify < radius(); dify++) {
+                int difx = round(sqrt(radius() * radius() - dify * dify)) - 1;
+                fl_line(center().x - difx, center().y + dify, center().x + difx, center().y + dify);
+                Sleep(10); // [miliseconds]
+            }
+            start = 1;
+        }
+        
         fl_color(color().as_int());
     }
 
@@ -1082,17 +1105,19 @@ void Striped_closed_polyline::draw_lines() const
         int x_max = point(0).x;
         int y_min = point(0).y;
         int y_max = point(0).y;
-
+        static int start{};
+        //static int change{};
         for(int n = 0; n<number_of_points(); n++){
             if(x_min>point(n).x) x_min = point(n).x;
             if(x_max<point(n).x) x_max = point(n).x;
             if(y_min>point(n).y) y_min = point(n).y;
-            if(y_min<point(n).y) y_max = point(n).y;
+            if(y_max<point(n).y) y_max = point(n).y;
         }
         std::cout << x_min << ' ' << x_max << ' '
                   << y_min << ' ' << y_max << '\n';
         x_min-=10;
         x_max+=10;
+
         for(int y = y_min; y<y_max; y+=2){
             Point intersection;
             std::vector<Point> inters_vect;
@@ -1105,15 +1130,22 @@ void Striped_closed_polyline::draw_lines() const
                 inters_vect.push_back(intersection);
 
             //
-            //sort()
-            for(int i = 1; i<inters_vect.size(); i++){
-                fl_line(inters_vect[i-1].x, inters_vect[i-1].y, inters_vect[i].x, inters_vect[i].y);
-                Sleep(100);
+                //sort()
+            if (start) {
+                for (int i = 1; i < inters_vect.size(); i++) {
+                        fl_line(inters_vect[i - 1].x, inters_vect[i - 1].y, inters_vect[i].x, inters_vect[i].y);
+                }
             }
+            else {
+                for (int i = 1; i < inters_vect.size(); i++) {
+                    fl_line(inters_vect[i - 1].x, inters_vect[i - 1].y, inters_vect[i].x, inters_vect[i].y);
+                    Sleep(20);
+                }
+            }
+
         }
-
-
         //std::cout << "par" << par << " intersection: " <<
+        start = { 1 };
         fl_color(color().as_int());
     }
     if (color().visibility()) {
@@ -1198,59 +1230,75 @@ void Striped_closed_polyline::draw_lines() const
         for (int i = 0; i < size(); i++)
             shape_v[i].draw();
     }
+ //---------------------------------------------------------------------------------
+    Tiles::Tiles(Point p1, Point p2, int slq)
+    {
+        add(p1); // North-West point
+        add(p2); // South-east point
 
+        for (int dy = 0, oddy = 0; dy < point(1).y-point(0).y; dy += slq)
+        {
+            for (int dx = 0, oddx = oddy; dx < point(1).x -point(0).x; dx += slq) {
+                (*this).add_Shape(new Graph_lib::Rectangle(Graph_lib::Point(point(0).x + dx, point(0).y + dy), slq, slq));
+                if (oddx % 2)
+                    (*this)[(*this).size() - 1].set_fill_color(Graph_lib::Color::blue);
+                else
+                    (*this)[(*this).size() - 1].set_fill_color(Graph_lib::Color::black);
+                ++oddx;
+            }
+            ++oddy;
+        }
+    }
 
+    void Tiles::change_color_squares(Fl_Color firstc, Fl_Color secondc)
+    {
+        
+        for (int s = 0, oddy = 0, oddx = 0; s < (*this).size(); s++) {
+            if (oddx % 2)
+                (*this)[s].set_fill_color(firstc);
+            else
+                (*this)[s].set_fill_color(secondc);
+            ++oddx;
+            if ((*this).size() > s + 1 && (*this)[s + 1].point(0).y != (*this)[s].point(0).y) {
+                ++oddy;
+                oddx = oddy;
+            }
+
+        }
+    }
+
+ //---------------------------------------------------------------------------------
 Binary_tree::Binary_tree(int levels, int size, Point pnorthwest)
     : lvls(levels), shape_size{ size }
 {
     add(pnorthwest);
-
+    pbottom_lvl.y = point(0).y + 0.5 * shape_size;
     int shape_count = pow(2, lvls-1); // size for the c 
-    int xsoutheast = dx * (shape_count) + point(0).x-shape_size;
-    int ysoutheast = dy * (lvls-1 ) + point(0).y + shape_size;
-    //std::cout << "x:" << xsoutheast << "y:" << ysoutheast << '\n';
-    //std::cout << "x:" << pnorthwest.x << "y:" << pnorthwest.y << '\n';
-    Point psoutheast(xsoutheast, ysoutheast);
-    add(psoutheast);
-    int xmid = (psoutheast.x - pnorthwest.x)/2 + point(0).x;
-    int ymid = (psoutheast.y - pnorthwest.y)/2 + point(0).y;
-    add(Point(xmid, ymid));
-    pbottom_lvl.x = xmid;
-    pbottom_lvl.y = point(0).y+0.5*shape_size;
-    a.add_Shape(new Graph_lib::Mark(pnorthwest, 'x'));
-    a.add_Shape(new Graph_lib::Mark(psoutheast, 'x'));
     while (shape_count >c.size())
     {
-        add_lvl_center();
+        add_lvl();
     }
+    //print_pmid_psoutheast();// points mid, southeast
  }
 
 
-void Binary_tree::add_lvl_center()
+void Binary_tree::add_lvl()
 {
-    c_count_bottom_lvl = pow(2, bottom_lvl); // how many circles at the bottom lvl
+    int c_count_bottom_lvl = pow(2, bottom_lvl); // how many circles at the bottom lvl, // (2^n)/2
+    pbottom_lvl.x = point(0).x + shape_size * (pow(2, lvls - 1 - bottom_lvl) - 1) + 0.5 * shape_size;
     int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-    // 
-    int coefficient_lvl = 1;
-    if (lvls-1 > bottom_lvl)
-    {
-        coefficient_lvl = pow(2, lvls - 1 - bottom_lvl);// (lvls-1-bottom_lvl);
-
-    }
     int dxc = 0;
     // add circles
     for (int count = 0; count < c_count_bottom_lvl; count++) {
         c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size / 2));
         c.set_color(Graph_lib::Color::blue);
-        dxc += shape_size* pow(2, lvls  - bottom_lvl);// +dx * (lvls - 1 - bottom_lvl);
+        dxc += shape_size* pow(2, lvls  - bottom_lvl);
     }
-    //std::cout << s((const Circle&)c[0]).x << '\n';
-    // move parent circle , and upper arrows
-
-
-    // add arrows
+    
+    int dxt = shape_size * 0.25; // difference for text in x
+    int dyt = shape_size * 0.6;   // difference for text in y
     if (csize > 0) {
+        // add arrows
         int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
        // std::cout << "nodes: " << pnodes << '\n';
         for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
@@ -1259,59 +1307,48 @@ void Binary_tree::add_lvl_center()
             if (count % 2)
                 node++;
         }
+        
+        // add Text
+        std::string ct = "l"; // text
+        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
+            gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[csize + count]).point(0).x + dxt, ((const Circle&)c[csize + count]).point(0).y + dyt), ((const Text&)gtext[csize - pnodes+node]).label() + ct));
+            gtext.set_color(Graph_lib::Color::blue);
+            if (count % 2)
+                ct = "l";
+            else
+                ct = "r";
+            if (count % 2)
+                node++;
+        }
+    } 
+    else {
+        gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[0]).point(0).x+dxt, ((const Circle&)c[0]).point(0).y+dyt), std::string("rl")));
+        gtext.set_color(Graph_lib::Color::blue);
     }
-    
-    
-    //pbottom_lvl.x = point(0).x + 0.75*dx + dx*(lvls-3-bottom_lvl);
-    
-    // update variables to default values for the next add_lvl
+    // update variables values
     bottom_lvl++;
-    int s = shape_size * (pow(2, lvls - 1 - bottom_lvl) - 1);
-    pbottom_lvl.x = point(0).x + shape_size*(pow(2, lvls-1-bottom_lvl)-1) + 0.5 * shape_size;
-    std::cout << "bottom_lvl:" << bottom_lvl << '\n'
-        << "coef:" << coefficient_lvl << '\n'
-        << "s" << s << '\n';
-    
-    if (bottom_lvl == lvls-1)
-        pbottom_lvl.x = point(0).x + 0.5*shape_size;
-    
-    pbottom_lvl.y += dy;
+    pbottom_lvl.y += 2*shape_size;
 }
 
-
-void Binary_tree::add_lvl()
+void Binary_tree::print_pmid_psoutheast() const
 {
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
-    int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-
-    // add circles
-    int dxc=0;
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size / 2));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += dx;
-    }
-    //std::cout << s((const Circle&)c[0]).x << '\n';
-    // move parent circle , and upper arrows
-
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-       // std::cout << "nodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
-            a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-            a.set_color(Graph_lib::Color::blue);
-            if (count % 2)
-                node++;
-        }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-    pbottom_lvl.x -= dxc / 2;
-    pbottom_lvl.y += dy;
+    int shape_count = pow(2, lvls - 1);
+    Point psoutheast(0, 0);
+    int last_lvl = lvls - 1;
+    int differencex = shape_size * pow(2, lvls - (last_lvl));
+    int differencey = 2 * shape_size; // const 
+    psoutheast.x = differencex * (shape_count)+point(0).x - shape_size;
+    psoutheast.y = differencey * (lvls - 1) + point(0).y + shape_size;  
+    int xmid = (psoutheast.x - point(0).x) / 2 + point(0).x;
+    int ymid = (psoutheast.y - point(0).y) / 2 + point(0).y;
+    std::cout << "southeast x:" << psoutheast.x << "y:" << psoutheast.y << '\n';
+    std::cout << "northwest x:" <<point(0).x << "y:" << point(0).y << '\n';
+    // Graphic visual for the points, if you need it, remove const from function declaration
+    //a.add_Shape(new Graph_lib::Mark(point(0), 'x'));
+    //a.add_Shape(new Graph_lib::Mark(psoutheast, 'x'));
+   
 }
+
 
 void Binary_tree::add_arrows(int s)
 {}
@@ -1323,160 +1360,91 @@ void Binary_tree::ccentre(int lvl, int pixels)
 
 }
 
-
 void Binary_tree::draw_lines() const
 {
     for (int i = 0; i < a.size(); i++)
         a[i].draw();
     for (int i = 0; i < c.size(); i++)
         c[i].draw();
+    for (int i = 0; i < gtext.size(); i++)
+        gtext[i].draw();
+
 }
 
+//----------------------------------------------------------------------------------
 
-void Binary_tree::add_lvl_left()
-{
-    c_count_bottom_lvl = pow(2, bottom_lvl-1); // how many circles at the bottom lvl
-    int csize = c.size();
-    std::cout << "before csize:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-    int dxc = 0;
-    // add circles
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x+dxc, pbottom_lvl.y), shape_size));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += dx;
-    }
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-        std::cout << "pnodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {        
-                a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-                a.set_color(Graph_lib::Color::blue);
-                if (count % 2)
-                    node++;
-       }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-   
-    pbottom_lvl.y += dy;
-}
-
-
-
-
-
-Binary_tree_triangle::Binary_tree_triangle(int levels, int size)
-    : Binary_tree(size)
+Binary_tree_triangle::Binary_tree_triangle(int levels, int size, Point pnorthwest)
+    : Binary_tree(size, pnorthwest)
 {
     lvls = {levels };
     int shape_count = pow(2, lvls) - 1;
+    add(pnorthwest);
+    pbottom_lvl.y = point(0).y + shape_size;
     while (shape_count > c.size())
     {
         add_lvl();
     }
 }
 
-void Binary_tree_triangle::add_lvl_left()
-{
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
-    int csize = c.size();
-    std::cout << "before csize:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-    int dxc = 0;
-    // add circles
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += 3 * shape_size;
-    }
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-        std::cout << "pnodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
-            a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-            a.set_color(Graph_lib::Color::blue);
-            if (count % 2)
-                node++;
-        }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-    pbottom_lvl.y += dy;
-}
-
-void Binary_tree_triangle::add_lvl_center()
-{
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
-    int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-
-    int dxc = 0;
-    // add circles
-    for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Circle(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size));
-        c.set_color(Graph_lib::Color::blue);
-        dxc += 3 * shape_size;
-    }
-
-    // add arrows
-    if (csize > 0) {
-        int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
-       // std::cout << "nodes: " << pnodes << '\n';
-        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
-            a.add_Shape(new Graph_lib::Arrow(s((const Circle&)c[csize - pnodes + node]), n((const Circle&)c[count + csize])));
-            a.set_color(Graph_lib::Color::blue);
-            if (count % 2)
-                node++;
-        }
-    }
-    // update variables to default values for the next add_lvl
-    bottom_lvl++;
-    pbottom_lvl.x -= dx / 2 - 3 * shape_size / 2;
-    pbottom_lvl.y += dy;
-}
 
 void Binary_tree_triangle::add_lvl()
 {
-    c_count_bottom_lvl = pow(2, bottom_lvl - 1); // how many circles at the bottom lvl
+    int c_count_bottom_lvl = pow(2, bottom_lvl); // how many triangles at the bottom lvl // (2^n)/2
+    int ang_bac = 30;
+    double theta = ang_bac * PI / 180;
+    pbottom_lvl.x = point(0).x + shape_size * (pow(2, lvls - 1 - bottom_lvl) - 1) +(shape_size/cos(theta)); // it's aproximation
     int csize = c.size();
-    //std::cout << "size:" << csize << '\n' << "ccount_lvl:" << c_count_bottom_lvl << '\n';
-
     int dxc = 0;
     // add circles
     for (int count = 0; count < c_count_bottom_lvl; count++) {
-        c.add_Shape(new Graph_lib::Regular_polygon(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size, 3, 30));
+        // THere is need to correct shape_size value for Regular_polygon(...dis_center!=shape_size,...)
+        c.add_Shape(new Graph_lib::Regular_polygon(Point(pbottom_lvl.x + dxc, pbottom_lvl.y), shape_size, 3, ang_bac));
         c.set_color(Graph_lib::Color::blue);
-        dxc += dx;
+        dxc += shape_size * pow(2, lvls - bottom_lvl);
     }
-    //std::cout << s((const Circle&)c[0]).x << '\n';
-    // move parent circle , and upper arrows
 
-/*
+    int dxt = shape_size * -1.2; // difference for text in x
+    int dyt = shape_size * -0.5;   // difference for text in y
     // add arrows
     if (csize > 0) {
+
         int pnodes = c_count_bottom_lvl / 2; // how many parent nodes
        // std::cout << "nodes: " << pnodes << '\n';
+        /*
         for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
             a.add_Shape(new Graph_lib::Arrow((const Right_triangle&)c[csize - pnodes + node])->point[], (const Right_triangle&)c[count + csize])));
             a.set_color(Graph_lib::Color::blue);
             if (count % 2)
                 node++;
         }
+*/
+                // add Text
+        std::string ct = "l"; // text
+        for (int count = 0, node = 0; count < c_count_bottom_lvl && node < pnodes; count++) {
+            gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[csize + count]).point(0).x + dxt, ((const Circle&)c[csize + count]).point(0).y + dyt), ((const Text&)gtext[csize - pnodes+node]).label() + ct));
+            gtext.set_color(Graph_lib::Color::blue);
+            if (count % 2)
+                ct = "l";
+            else
+                ct = "r";
+            if (count % 2)
+                node++;
+        }
+  
     }
-    */
+    else {
+        gtext.add_Shape(new Graph_lib::Text(Point(((const Circle&)c[0]).point(0).x + dxt, ((const Circle&)c[0]).point(0).y + dyt), std::string("rl")));
+        gtext.set_color(Graph_lib::Color::blue);
+    }
+    
     // update variables to default values for the next add_lvl
     bottom_lvl++;
-    pbottom_lvl.x -= dx / 2 - 3 * shape_size / 2;
-    pbottom_lvl.y += dy;
+    pbottom_lvl.y += shape_size*2;
 }
 
 void Binary_tree_triangle::ccentre(int lvl, int pixels)
 {
     int c_count_move = pow(2, lvl - 1);
-
 
 }
 
@@ -1487,10 +1455,101 @@ void Binary_tree_triangle::draw_lines() const
     for (int i = 0; i < a.size(); i++)
         a[i].draw();
     */
+    //  draw triangles 
     for (int i = 0; i < c.size(); i++)
         c[i].draw();
+
+    // draw text
+    for (int i = 0; i < c.size(); i++)
+        gtext[i].draw();
+
+}
+
+//---------------------------------------------------------------------------------
+void S_Controller::show() const { 
+    std::cout << "Controller show():\n"
+        << "set on: " << state << '\n'
+        << "level :" << lvl << '\n';
+};
+
+void test_Controller_Status::show() const
+{
+    std::cout << "test_Controller Status show()" << '\n'
+        << "set on: " << state << '\n'
+        << "level :" << lvl << '\n';
+   
+}
+void Controller_Status::show()
+{
+    std::cout << "Controller Status show() is calling to Controller::show()\n";
+    c.show();
+}
+
+//-------------------------
+
+void Shape_Controller::on()
+{
+    shape_p->set_color(Color::visible);
+    shape_p->set_fill_color(Color::visible);
+}
+
+void Shape_Controller::off()
+{
+    shape_p->set_color(Color::invisible);
+    shape_p->set_fill_color(Color::invisible);
+}
+
+void Shape_Controller::set_level(int level)
+{
+    //if (474 > level) shp->set_color(fl_color_cube(level / 100, level / 10, level % 10));
+    if(256>level)
+        shape_p->set_color(level);
+}
+
+void Shape_Controller::set_fill_level(int level)
+{
+    if (256 > level) shape_p->set_fill_color(level);
 }
 
 
+void Shape_Controller::show() const 
+{
+    std::cout << "Shape_Controller is set: " << (( Color::visible == shape_p->color().visibility())? "on":"off") << '\n'
+    << "Color as int: " << shape_p->color().as_int() << '\n'
+    << "Fill color as int: " << shape_p->fill_color().as_int() << '\n';
+}
+
+//---------------------------------------------------------------------------------
+
+//Function::Function()
+//{
+//    for (int i = -70; i < 70; i++) {
+//        add(Graph_lib::Point(i + 200, parabola(i) + 100));
+//    }
+//}
+//
+//Function::Function(Fct f)
+//{
+//    for (int i = -70; i < width_window / 6; i++) {
+//        add(Graph_lib::Point(i + 300, f(i) + 100));
+//    }
+//}
+//
+//Function::Function(Fct f, double r_min, double r_max, Graph_lib::Point xy,
+//    int count, double xscale, double yscale)
+//{
+//    double dis = (r_max - r_min) / count;
+//    double r = r_min;
+//    for (int i = 0; i < count; i++) {
+//        add(Graph_lib::Point(xy.x + xscale * r, xy.y + yscale * f(r)));
+//        r += dis;
+//    }
+//
+//}
+//void Function::draw_lines() const
+//{
+//    if (color().visibility())
+//        Shape::draw_lines();
+//}
 
 } // Graph
