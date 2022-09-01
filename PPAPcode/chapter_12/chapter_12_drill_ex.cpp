@@ -165,7 +165,7 @@ void drill(Graph_lib::Simple_window& win)
     win.attach(ya);
 
 
-    Function sine{ sin,0,100,Point{20,150},1000,50,50 };
+    Function sine( static_cast<double(*)(double)>(sin), 0, 100, Point{20,150}, 1000, 50, 50);
     sine.set_color(Color::magenta);
     win.attach(sine);
 

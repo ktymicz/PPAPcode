@@ -71,7 +71,7 @@ try
 	win.attach(txy_d2);
 	
 	
-	Graph_lib::Function m_xy_d2([](double x) {return -x / 2; }, -len, len + 1, orig, 21, xscale, yscale);
+	Graph_lib::Function m_xy_d2{[](double x) {return -x / 2; }, -len, len + 1, orig, 21, xscale, yscale};
 	m_xy_d2.set_color(fl_color_cube(3, 4, 2));
 	win.attach(m_xy_d2);
 	Graph_lib::Point pt{ m_xy_d2.point(0).x, m_xy_d2.point(0).y - yscale/2 }; // y = -x/2
@@ -80,7 +80,7 @@ try
 	win.attach(t_m_xy_d2);
 
 
-	Graph_lib::Function s(Graph_lib::line4, -len, len + 1, orig, xscale, yscale);
+	Graph_lib::Function s{ Graph_lib::line4, -len, len + 1, orig, xscale, yscale };
 	s.set_color(fl_color_cube(3, 5, 2));
 	win.attach(s);
 
@@ -98,7 +98,30 @@ try
 
 	//Graph_lib::Function s3(Graph_lib::parabola, -10, 11, Graph_lib::Point(200, 50), 400, 25, 25);
 	//win.attach(s3);
+
+	Graph_lib::Function real_exp( static_cast<double(*)(double)>(exp), -len, len + 1, orig);
+	real_exp.set_color(Graph_lib::Color::red);
+	win.attach(real_exp);
 	win.wait_for_button();
+
+	Graph_lib::Simple_window win2(orig, width_window, height_window, "Chapter 15");
+
+	for (int n = 0; n < 50; n++)
+	{
+		std::ostringstream ss;
+		ss << "exp approximation; n==" << n;
+		win2.set_label(ss.str());
+		
+		// get approximation
+		Graph_lib::Function exn{ [n](double x) { return Graph_lib::exPower(x, n); },
+			-len, 5, orig, 100,50,50 };
+		win2.attach(exn);
+		win2.wait_for_button();
+		win2.detach(exn);
+	}
+
+	
+
 	return 0;
 }
 catch (std::exception& e)

@@ -129,8 +129,8 @@ public:
 
 //------------------------------------------------------------------------------
 
-typedef double Fct(double);
-//using Fct = std::function<double(double)>;
+//typedef double Fct(double);
+using Fct = std::function<double(double)>;
 
 class Shape  {	// deals with color and style, and holds sequence of lines
 protected:
@@ -184,10 +184,11 @@ protected:
 };
 
 //------------------------------------------------------------------------------
-
+//using Fct2 = std::function<double( double)>;
 struct Function : Shape {
 	// the function parameters are not stored
 	Function(Fct f, double r1, double r2, Point orig, int count = 100, double xscale = 25, double yscale = 25);
+	//Function(Fct2 f, double r1, double r2, Point orig, int count = 100, double xscale = 25, double yscale = 25);
 
 	//Function(Point orig, Fct f, double r1, double r2, int count, double xscale = 1, double yscale = 1);
 public:
@@ -876,12 +877,29 @@ public:
 //using Fct = std::function<double(double)>;
 // functions
 
+inline long int fac(long int n)
+{
+	int i = 1;
+	while (n > 1) {
+		i *= n;
+		--n;
+	}
+	return i;
+}
+inline double term(double x, long int n)
+{
+	return  pow(x, n) / fac(n);
+}
+double exPower(double x, int n);
+
 
  inline double line4(double i) { return 4; };
 inline  double parabola(double x)
 {
 	return x * x;
 }
+
+
 
 //class Function : public Shape
 //{
